@@ -19,7 +19,6 @@ datatype sentence =  P | Q | R | S | T             (* allowable sent. vars    *)
                    | --> of sentence * sentence    (* conditional:   P --> Q  *) 
                    | <-> of sentence * sentence;   (* biconditional: P <-> Q  *) 
 
-
 (* REMOVE ARROWS -- removeArrows *) 
 fun removeArrows(~f)      = ~(removeArrows(f))  
   | removeArrows(f & g)   = removeArrows(f) & removeArrows(g)
@@ -29,7 +28,6 @@ fun removeArrows(~f)      = ~(removeArrows(f))
 	(removeArrows(~f) & removeArrows(~g)))
   | removeArrows(f)       = f;
 
-
 (* BRING IN NEGATION, REMOVING DOUBLE NEGATIONS AS WE GO  *) 
 fun bringInNegation(~(~f))    = bringInNegation(f)
   | bringInNegation(f & g)    = bringInNegation(f) & bringInNegation(g)
@@ -38,17 +36,40 @@ fun bringInNegation(~(~f))    = bringInNegation(f)
   | bringInNegation(~(f v g)) = bringInNegation(~f) & bringInNegation(~g)
   | bringInNegation(f)        = f;
 
-
 (* DISTRIBUTE THE DISJUNCTION IN THE CONJUNCTIONS *) 
-(*
-fun distributeDisjInConj(f v (g & h)) = ...
-  ......
-  | distributeDisjInConj(f v g)   = distributeDisjInConj f v distributeDisjInConj g
-  ......
-*)
+fun distributeDisjInConj(f v (g & h)) = (distributeDisjInConj(f v g) & distributeDisjInConj(f v h))
+  | distributeDisjInConj((g & h) v f) = (distributeDisjInConj(g v f) & distributeDisjInConj(h v f))
+  | distributeDisjInConj(f v g) =  distributeDisjInConj f v distributeDisjInConj g
+  | distributeDisjInConj(f & g) =  distributeDisjInConj f & distributeDisjInConj g
+  | distributeDisjInConj f = f;
 
-(*
+(* PRINTS OUT CNF WITHOUT ENCLOSING PARENTHESIS*)
+fun show2(f & g) = (show2(f); print " & "; show2(g))
+  | show2(f v g) = (show2(f); print " v "; show2(g))
+  | show2(f --> g) = (show2(f); print " -> "; show2(g))
+  | show2(f <-> g) = (show2(f); print " <-> "; show2(g))
+  | show2(~ f) = (print "-"; show2(f))
+  | show2(P) = (print "P")
+  | show2(Q) = (print "Q")
+  | show2(R) = (print "R")
+  | show2(S) = (print "S")
+  | show2(T) = (print "T");
+
 (* TOP LEVEL FUNCTIONS *)
+fun show(f & g) = (print "(" ; show2(f); print ") & ("; show2(g); print ")")
+  | show(f v g) = (print "(" ; show2(f); print ") v ("; show2(g); print ")")
+  | show(f --> g) = (print "("; show2(f); print ") -> ("; show2(g); print ")")
+  | show(f <-> g) = (print "("; show2(f); print ") <-> ("; show2(g); print ")")
+  | show(~ f) = (print "-"; show2(f); print "")
+  | show(P) = (print "P")
+  | show(Q) = (print "Q")
+  | show(R) = (print "R")
+  | show(S) = (print "S")
+  | show(T) = (print "T");
+
+fun cnf (s) = (distributeDisjInConj(bringInNegation(removeArrows(s))));
+
+
 fun run s  =  (print "\nSentence is: "; 
                show s; 
                print "\n Its CNF is: ";
@@ -76,7 +97,7 @@ fun go s =  let
                 (printNStr("=",80);
                  go1(1,count,s) )
             end;
-*)
+
 (*---------------------------------------------------------------------------*) 
 (* TESTING EXAMPLES *) 
 
