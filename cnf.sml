@@ -43,24 +43,26 @@ fun distributeDisjInConj(f v (g & h)) = (distributeDisjInConj(f v g) & distribut
   | distributeDisjInConj(f & g) =  distributeDisjInConj f & distributeDisjInConj g
   | distributeDisjInConj f = f;
 
-(* PRINTS OUT CNF WITHOUT ENCLOSING PARENTHESIS*)
-fun show2(f & g) = (show2(f); print " & "; show2(g))
-  | show2(f v g) = (show2(f); print " v "; show2(g))
-  | show2(f --> g) = (show2(f); print " -> "; show2(g))
-  | show2(f <-> g) = (show2(f); print " <-> "; show2(g))
-  | show2(~ f) = (print "-"; show2(f))
-  | show2(P) = (print "P")
-  | show2(Q) = (print "Q")
-  | show2(R) = (print "R")
-  | show2(S) = (print "S")
-  | show2(T) = (print "T");
-
 (* TOP LEVEL FUNCTIONS *)
-fun show(f & g) = (print "(" ; show2(f); print ") & ("; show2(g); print ")")
-  | show(f v g) = (print "(" ; show2(f); print ") v ("; show2(g); print ")")
-  | show(f --> g) = (print "("; show2(f); print ") -> ("; show2(g); print ")")
-  | show(f <-> g) = (print "("; show2(f); print ") <-> ("; show2(g); print ")")
-  | show(~ f) = (print "-"; show2(f); print "")
+
+(* PRINTS OUT CNF WITHOUT ENCLOSING PARENTHESIS*)
+fun showWithOut(f & g) = (showWithOut(f); print " & "; showWithOut(g))
+  | showWithOut(f v g) = (showWithOut(f); print " v "; showWithOut(g))
+  | showWithOut(f --> g) = (showWithOut(f); print " -> "; showWithOut(g))
+  | showWithOut(f <-> g) = (showWithOut(f); print " <-> "; showWithOut(g))
+  | showWithOut(~ f) = (print "-"; showWithOut(f))
+  | showWithOut(P) = (print "P")
+  | showWithOut(Q) = (print "Q")
+  | showWithOut(R) = (print "R")
+  | showWithOut(S) = (print "S")
+  | showWithOut(T) = (print "T");
+
+(* PRINTS OUT CNF, CALLING SHOWWITHOUT() WHERE NEEDED *)
+fun show(f & g) = (print "(" ; showWithOut(f); print ") & ("; showWithOut(g); print ")")
+  | show(f v g) = (print "(" ; showWithOut(f); print ") v ("; showWithOut(g); print ")")
+  | show(f --> g) = (print "("; showWithOut(f); print ") -> ("; showWithOut(g); print ")")
+  | show(f <-> g) = (print "("; showWithOut(f); print ") <-> ("; showWithOut(g); print ")")
+  | show(~ f) = (print "-"; showWithOut(f); print "")
   | show(P) = (print "P")
   | show(Q) = (print "Q")
   | show(R) = (print "R")
