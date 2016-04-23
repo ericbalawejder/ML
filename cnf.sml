@@ -20,13 +20,13 @@ datatype sentence =  P | Q | R | S | T             (* allowable sent. vars    *)
                    | <-> of sentence * sentence;   (* biconditional: P <-> Q  *) 
 
 (* REMOVE ARROWS -- removeArrows *) 
-fun removeArrows(~f)      = ~(removeArrows(f))  
+fun removeArrows(~f)      = ~(removeArrows f)  
   | removeArrows(f & g)   = removeArrows(f) & removeArrows(g)
   | removeArrows(f v g)   = removeArrows(f) v removeArrows(g)
-  | removeArrows(f --> g) = ~(removeArrows(f)) v (removeArrows(g))
+  | removeArrows(f --> g) = ~(removeArrows f) v (removeArrows g)
   | removeArrows(f <-> g) = ((removeArrows(f) & removeArrows(g)) v 
 	(removeArrows(~f) & removeArrows(~g)))
-  | removeArrows(f)       = f;
+  | removeArrows f        = f;
 
 (* BRING IN NEGATION, REMOVING DOUBLE NEGATIONS AS WE GO  *) 
 fun bringInNegation(~(~f))    = bringInNegation(f)
@@ -39,39 +39,40 @@ fun bringInNegation(~(~f))    = bringInNegation(f)
 (* DISTRIBUTE THE DISJUNCTION IN THE CONJUNCTIONS *) 
 fun distributeDisjInConj(f v (g & h)) = (distributeDisjInConj(f v g) & distributeDisjInConj(f v h))
   | distributeDisjInConj((g & h) v f) = (distributeDisjInConj(g v f) & distributeDisjInConj(h v f))
-  | distributeDisjInConj(f v g) =  distributeDisjInConj f v distributeDisjInConj g
-  | distributeDisjInConj(f & g) =  distributeDisjInConj f & distributeDisjInConj g
+  | distributeDisjInConj(f v g) =  distributeDisjInConj(f) v distributeDisjInConj(g)
+  | distributeDisjInConj(f & g) =  distributeDisjInConj(f) & distributeDisjInConj(g)
   | distributeDisjInConj f = f;
 
 (* TOP LEVEL FUNCTIONS *)
 
 (* PRINTS OUT CNF WITHOUT ENCLOSING PARENTHESIS*)
-fun showWithOut(f & g) = (showWithOut(f); print " & "; showWithOut(g))
-  | showWithOut(f v g) = (showWithOut(f); print " v "; showWithOut(g))
-  | showWithOut(f --> g) = (showWithOut(f); print " -> "; showWithOut(g))
-  | showWithOut(f <-> g) = (showWithOut(f); print " <-> "; showWithOut(g))
-  | showWithOut(~ f) = (print "-"; showWithOut(f))
-  | showWithOut(P) = (print "P")
-  | showWithOut(Q) = (print "Q")
-  | showWithOut(R) = (print "R")
-  | showWithOut(S) = (print "S")
-  | showWithOut(T) = (print "T");
+fun showWith(f & g) = (print "("; showWith(f); print " & "; showWith(g); print ")")
+  | showWith(f v g) = (print "("; showWith(f); print " v "; showWith(g); print ")")
+  | showWith(f --> g) = (print "("; showWith(f); print " -> "; showWith(g); print ")")
+  | showWith(f <-> g) = (print "("; showWith(f); print " <-> "; showWith(g); print ")")
+  | showWith(~ f) = (print "-"; showWith(f))
+  | showWith(P) = (print "P")
+  | showWith(Q) = (print "Q")
+  | showWith(R) = (print "R")
+  | showWith(S) = (print "S")
+  | showWith(T) = (print "T");
 
-(* PRINTS OUT CNF, CALLING SHOWWITHOUT() WHERE NEEDED *)
-fun show(f & g) = (print "(" ; showWithOut(f); print ") & ("; showWithOut(g); print ")")
-  | show(f v g) = (print "(" ; showWithOut(f); print ") v ("; showWithOut(g); print ")")
-  | show(f --> g) = (print "("; showWithOut(f); print ") -> ("; showWithOut(g); print ")")
-  | show(f <-> g) = (print "("; showWithOut(f); print ") <-> ("; showWithOut(g); print ")")
-  | show(~ f) = (print "-"; showWithOut(f); print "")
+(* PRINTS OUT CNF, CALLING SHOWWITH() WHERE NEEDED *)
+fun show(f & g) = (showWith(f); print " & "; showWith(g))
+  | show(f v g) = (showWith(f); print " v "; showWith(g))
+  | show(f --> g) = (showWith(f); print " -> "; showWith(g))
+  | show(f <-> g) = (showWith(f); print " <-> "; showWith(g))
+  | show(~ f) = (print "-"; show(f))
   | show(P) = (print "P")
   | show(Q) = (print "Q")
   | show(R) = (print "R")
   | show(S) = (print "S")
   | show(T) = (print "T");
 
+(* CREATE THE CONJUCTIVE NORMAL FORM OF A SENTENCE OF SENTENIAL LOGIC *)
 fun cnf (s) = (distributeDisjInConj(bringInNegation(removeArrows(s))));
 
-
+(* CALLS CNF AND SHOW TO PRINT OUT CORRECT LOGIC FORM *)
 fun run s  =  (print "\nSentence is: "; 
                show s; 
                print "\n Its CNF is: ";
@@ -92,7 +93,7 @@ fun go1(_,_,nil) = print "\n"
                            printNStr("=", 80);
                            go1(i+1,n,ss));
 
-(* TOP LEVEL DRIVING FUNCTION *)
+(* TOP LEVEL DRIVING FUNCTION, CALLS TESTS BELOW *)
 fun go s =  let 
                 val count = length s
             in
