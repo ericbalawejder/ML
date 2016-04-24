@@ -45,7 +45,7 @@ fun distributeDisjInConj(f v (g & h)) = (distributeDisjInConj(f v g) & distribut
 
 (* TOP LEVEL FUNCTIONS *)
 
-(* PRINTS OUT CNF WITHOUT ENCLOSING PARENTHESIS*)
+(* PRINTS OUT CNF WITH ENCLOSING PARENTHESIS*)
 fun showWith(f & g) = (print "("; showWith(f); print " & "; showWith(g); print ")")
   | showWith(f v g) = (print "("; showWith(f); print " v "; showWith(g); print ")")
   | showWith(f --> g) = (print "("; showWith(f); print " -> "; showWith(g); print ")")
@@ -102,7 +102,7 @@ fun go s =  let
             end;
 
 (*---------------------------------------------------------------------------*) 
-(* TESTING EXAMPLES *) 
+(* TESTING EXAMPLES IMPORTED FROM DR. WYATT'S TESTS.SML *) 
 
 val f1 = P;
 val f2 = ~(P);
@@ -132,7 +132,6 @@ val f25 = ((P & Q) v (~ P & ~ R)) v ((S & T v (~ Q & ~ P)));
 
 val tests = [f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,
 	     f18,f19,f20,f21,f22,f23,f24,f25];
-
 
 (* END END END *)
 (*---------------------------------------------------------------------------*) 
